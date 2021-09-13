@@ -2,37 +2,50 @@ import java.util.Scanner;
 
 public class Hangman {
 
-    private static String[] words = {"cat", "dog", "hat", "bat", "dry", "lol", "hog"}; //list of words
+    static String start = (" H A N G M A N\n");
+    static String beam = (" +---+\n");
+    static String blank = "     |\n";
+    static String head = " +---+\n" + " O   |\n";
+    static String neck = " |   |\n";
+    static String foot = " |   |\n";
+    static String plat = ("    ===\n");
+
+    static String wrong0 = beam + blank + blank + blank + plat;
+    static String wrong1 = head + blank + blank + plat;
+    static String wrong2 = head + neck + blank + plat;
+    static String wrong3 = head + neck + foot + plat;
+
+    static String[] wrongs = {wrong0, wrong1, wrong2, wrong3};
+    static int wrongIndex = 0;
+
+    private static String[] words = {"cat", "dog", "hat", "bat", "dry", "lol", "hog"};
     private static String word = words[(int) (Math.random() * words.length)];
-    //selects random word from words array
     private static String space = new String(new char[word.length()]).replace("\0", "_");
-    //take random word and replaces chars with spaces, assigns blanks to new variable 'space'
-    private static int count = 0; // initializing the count for the guesses
-    private static String missed = ""; //initializing variable for incorrect guesses
+
+    private static String missed = "";
 
     public static void main(String[] args) {
+
         Scanner scanner = new Scanner(System.in);
         boolean playing = true;
 
+        System.out.println(start + wrongs[wrongIndex]);
+
         while (playing) {
-            System.out.println("H A N G M A N");
-            System.out.println("+---+");
-            System.out.println("    |");
-            System.out.println("    |");
-            System.out.println("    |");
-            System.out.println("   ===");
-            System.out.println("Missed letters:");
 
             //while the variable space contains spaces ('_') it will ask the player to pick a letter,
             // stores the input in 'guess'
             while (space.contains("_")) {
+                System.out.println("Missed letters:\n" + missed);
                 System.out.println(space);
                 System.out.println("Guess a letter.");
-                String guess = scanner.next();
+                String guess = scanner.next().toLowerCase();
+                String usedLetters = "";
+                usedLetters += guess;
 
                 //passes user input to gallows and missedLetter methods
                 gallows(guess);
-                missedLetter(guess);
+                missedLetter(guess, usedLetters);
             }
             scanner.close();
         }
@@ -57,7 +70,6 @@ public class Hangman {
         }
 
         if (space.equals(spaceNew)) {
-            count++;
             hangman();
         } else {
             space = spaceNew;
@@ -66,41 +78,26 @@ public class Hangman {
             System.out.println("Yes! The secret word is " + word + "! You have won!");
         }
     }
-        boolean playing = true;
 
-    public static String missedLetter(String guess) {
-        if (!word.contains(guess)) {
-            missed += guess;
-        } else if(missed.contains(guess)) {
+    public static String missedLetter(String guess, String usedLetters) {
+        if (usedLetters.contains(guess)) {
             System.out.println("You have already guessed that letter. Choose again.");
+        }
+        if (!word.contains(guess) && !missed.contains(guess)) {
+            missed += guess;
+            wrongIndex++;
+        }
+        if (wrongIndex == 4) {
+            System.out.println("Sorry! The secret word was " + word + "! You have lost...");
         }
         return missed;
     }
 
     public static void hangman() {
-        if (count == 1) {
-            System.out.println("+---+");
-            System.out.println("O   |");
-            System.out.println("    |");
-            System.out.println("    |");
-            System.out.println("   ===");
-            System.out.println("Missed letters:" + missed);
-        }
-        if (count == 2) {
-            System.out.println("+---+");
-            System.out.println("O   |");
-            System.out.println("|   |");
-            System.out.println("    |");
-            System.out.println("   ===");
-            System.out.println("Missed letters:" + missed);
-        }
-        if (count == 3) {
-            System.out.println("+---+");
-            System.out.println("O   |");
-            System.out.println("|   |");
-            System.out.println("|   |");
-            System.out.println("   ===");
-            System.out.println("Missed letters:" + missed);
+        int count = 0;
+        if (wrongIndex <= 3) {
+            System.out.println(wrongs[wrongIndex]);
         }
     }
 }
+
