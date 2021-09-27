@@ -2,6 +2,7 @@
 <project version="4">
   <component name="ProjectModuleManager">
     <modules>
+      <module fileurl="file://$PROJECT_DIR$/BattleshipGame/BattleshipGame.iml" filepath="$PROJECT_DIR$/BattleshipGame/BattleshipGame.iml" />
       <module fileurl="file://$PROJECT_DIR$/DragonCave/DragonCave.iml" filepath="$PROJECT_DIR$/DragonCave/DragonCave.iml" />
       <module fileurl="file://$PROJECT_DIR$/.idea/GS.iml" filepath="$PROJECT_DIR$/.idea/GS.iml" />
       <module fileurl="file://$PROJECT_DIR$/GuessTheNumber/GuessTheNumber.iml" filepath="$PROJECT_DIR$/GuessTheNumber/GuessTheNumber.iml" />

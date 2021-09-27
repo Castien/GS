@@ -1,3 +1,5 @@
+import java.util.InputMismatchException;
+import java.util.NoSuchElementException;
 import java.util.Random;
 import java.util.Scanner;
 
@@ -8,13 +10,10 @@ public class TicTacToe {
 
         boolean playing = true;
 
-        while(playing) {
-
+        do {
             Random random = new Random();
             Scanner scan = new Scanner(System.in);
-            char letterScan = 0;
-            char letter = 0;
-            char letterHP = 0;
+
             char letterCP = 0;
             int first = 0;
             first = random.nextInt(2);
@@ -28,21 +27,16 @@ public class TicTacToe {
 
             getBoard(board);
 
+            char letterHP = letterCheck(scan);
 
-            if (!(letterScan == 'X') || !(letterScan == 'O')) {
-                System.out.println("Do you want to be X or O?");
-                letterScan = scan.next().charAt(0);
-                letter = Character.toUpperCase(letterScan);
-                if (letter == 'X') {
-                    letterHP = 'X';
-                    letterCP = 'O';
-                    System.out.println("You are X's.");
-                } else {
-                    letterHP = 'O';
-                    letterCP = 'X';
-                    System.out.println("You are the O's.");
-                }
+            if (letterHP == 'X') {
+                System.out.println("You are X's.");
+                letterCP = 'O';
+            } else if (letterHP == 'O') {
+                System.out.println("You are the O's.");
+                letterCP = 'X';
             }
+
 
             if (first < 1) {
                 System.out.println("The computer will go first.");
@@ -82,29 +76,48 @@ public class TicTacToe {
                 }
             }
 
-            System.out.println("Would you like to play again? (Enter 'y' or 'n':)");
             scan.nextLine();
-            String restart = scan.nextLine();
-
-            if(!restart.equalsIgnoreCase("y")) {
-                if (restart.equalsIgnoreCase("n")) {
-                    System.out.println("Thanks for playing!");
-                    playing = false;
-                }
-            }
+            System.out.println("Would you like to play again? (Enter 'y' or 'n':)");
+            playAgain(scan, playing);
         }
+        while (playing);
+    }
 
+    private static char letterCheck(Scanner scan) {
+        char letterHP = 0;
+        boolean invalidLetter = true;
+        do {
+            try {
+                System.out.println("Do you want to be X or O?");
+                letterHP = scan.next().charAt(0);
+                letterHP -= 32;
+
+                if (!(letterHP == 'X' || letterHP == 'O')) {
+                    throw new InputMismatchException();
+                }
+                else {
+                    invalidLetter = false;
+                }
+            } catch (InputMismatchException l) {
+                System.out.println("Please enter 'X' or 'O':");
+            }
+        }while (invalidLetter);
+       return letterHP;
     }
 
 
     private static void player(char[][] board, Scanner scan, char letter) {
-        int userInput;
+        int userInput = 10;
         while (true) {
             System.out.println("What is your next move? (1-9)");
-            userInput = scan.nextInt();
-            if (isValid(board, userInput)){
-                break;
-            } else {
+            try {
+                userInput = scan.nextInt();
+                if (isValid(board, userInput)) {
+                    break;
+                } else {
+                    throw new InputMismatchException();
+                }
+            } catch (InputMismatchException p) {
                 System.out.println(userInput + " is not a valid move.");
             }
         }
@@ -228,5 +241,24 @@ public class TicTacToe {
             System.out.println(board[1][0] + "|" +  board[1][1] + "|" +  board[1][2] );
             System.out.println("-+-+-");
             System.out.println(board[2][0] + "|" +  board[2][1] + "|" +  board[2][2] );
+    }
+
+    private static boolean playAgain(Scanner scan, boolean playing) {
+        do {
+            try {
+                String restart = scan.nextLine();
+                if (restart.equalsIgnoreCase("y")) {
+                    break;
+                } else if (restart.equalsIgnoreCase("n")) {
+                    System.out.println("Thanks for playing!");
+                    playing = false;
+                } else {
+                    throw new NoSuchElementException();
+                }
+            } catch (NoSuchElementException ns) {
+                System.out.println("Must choose 'y' or 'n'.");
+            }
+        } while (true);
+        return playing;
     }
 }

@@ -49,9 +49,11 @@ public class Land {
 
     public void playGame() {
         Scanner scan = new Scanner(System.in);
+        String countKills;
         do {
             updateMap();
-            printMap();
+            countKills = countDefeated(defeated);
+            printMap(countKills);
             goblinMove();
             boolean temp;
             do {
@@ -59,44 +61,57 @@ public class Land {
             }while (!temp);
             processMove();
         }while(!death && defeated < 3);
-        printMap();
+        printMap(countKills);
         System.out.println(defeated == 3 ? "All the Goblins are dead! Huzzah!\n" : "Game Over");
+
+        scan.nextLine();
+        System.out.println("Would you like to play again? (Enter 'y' or 'n':)");
+
     }
 
-    private void printMap() {
-        String countKills = switch (defeated) {
-            default -> defeated + "            You have goblins to kill.\n";
-            case 1 -> defeated + "            You have 2 more goblins to kill.\n";
-            case 2 -> defeated + "            You have 1 more goblins to kill.\n";
-            case 3 -> defeated + "            You have won! All goblins are defeated!\n";
-        };
+    private String countDefeated(int defeated) {
+        String result = null;
+        switch (defeated) {
+            default:
+                result = defeated + "            You have goblins to kill.\n";
+                return result;
+            case 1:
+                result = defeated + "            You have 2 more goblins to kill.\n";
+                return result;
+            case 2:
+                result = defeated + "            You have 1 more goblins to kill.\n";
+                return result;
+            case 3:
+                result = defeated + "            You have won! All goblins are defeated!\n";
+                return result;
+        }
+    }
 
-        System.out.printf(
-                """
-                        Defeated: %s
-                        +------+------+------+------+------+------+------+------+
-                        |  %s  |  %s  |  %s  |  %s  |  %s  |  %s  |  %s  |  %s  |
-                        +------+------+------+------+------+------+------+------+
-                        |  %s  |  %s  |  %s  |  %s  |  %s  |  %s  |  %s  |  %s  |
-                        +------+------+------+------+------+------+------+------+
-                        |  %s  |  %s  |  %s  |  %s  |  %s  |  %s  |  %s  |  %s  |
-                        +------+------+------+------+------+------+------+------+
-                        |  %s  |  %s  |  %s  |  %s  |  %s  |  %s  |  %s  |  %s  |
-                        +------+------+------+------+------+------+------+------+
-                        |  %s  |  %s  |  %s  |  %s  |  %s  |  %s  |  %s  |  %s  |
-                        +------+------+------+------+------+------+------+------+
-                        |  %s  |  %s  |  %s  |  %s  |  %s  |  %s  |  %s  |  %s  |
-                        +------+------+------+------+------+------+------+------+
-                        |  %s  |  %s  |  %s  |  %s  |  %s  |  %s  |  %s  |  %s  |
-                        +------+------+------+------+------+------+------+------+
-                        |  %s  |  %s  |  %s  |  %s  |  %s  |  %s  |  %s  |  %s  |
-                        +------+------+------+------+------+------+------+------+
-                                          North = N    East  = E
-                                          South = S    West =  W
-                                Health: %s / %s | Strength: %s  | Defense: %s
-                                Goblin: %s / %s | Strength: %s  | Defense: %s
-                        %n""",
-
+    private void printMap(String countKills) {
+        System.out.print(
+                String.format("Defeated: %s\n" +
+                        "+------+------+------+------+------+------+------+------+\n" +
+                        "|  %s  |  %s  |  %s  |  %s  |  %s  |  %s  |  %s  |  %s  |\n" +
+                        "+------+------+------+------+------+------+------+------+\n" +
+                        "|  %s  |  %s  |  %s  |  %s  |  %s  |  %s  |  %s  |  %s  |\n" +
+                        "+------+------+------+------+------+------+------+------+\n" +
+                        "|  %s  |  %s  |  %s  |  %s  |  %s  |  %s  |  %s  |  %s  |\n" +
+                        "+------+------+------+------+------+------+------+------+\n" +
+                        "|  %s  |  %s  |  %s  |  %s  |  %s  |  %s  |  %s  |  %s  |\n" +
+                        "+------+------+------+------+------+------+------+------+\n" +
+                        "|  %s  |  %s  |  %s  |  %s  |  %s  |  %s  |  %s  |  %s  |\n" +
+                        "+------+------+------+------+------+------+------+------+\n" +
+                        "|  %s  |  %s  |  %s  |  %s  |  %s  |  %s  |  %s  |  %s  |\n" +
+                        "+------+------+------+------+------+------+------+------+\n" +
+                        "|  %s  |  %s  |  %s  |  %s  |  %s  |  %s  |  %s  |  %s  |\n" +
+                        "+------+------+------+------+------+------+------+------+\n" +
+                        "|  %s  |  %s  |  %s  |  %s  |  %s  |  %s  |  %s  |  %s  |\n" +
+                        "+------+------+------+------+------+------+------+------+\n" +
+                        "                  North = N    East  = E                 \n" +
+                        "                  South = S    West =  W                 \n" +
+                        "       Health: %s / %s | Strength: %s  | Defense: %s     \n" +
+                        "       Goblin: %s / %s | Strength: %s  | Defense: %s     \n" +
+                        "\n",
                 countKills,
                 map[0][7].equals(" ") ? "  " : map[0][7],
                 map[1][7].equals(" ") ? "  " : map[1][7],
@@ -172,7 +187,7 @@ public class Land {
                 goblin.getMaxHealth(),
                 goblin.getStrength(),
                 goblin.getDefense()
-                );
+                ));
     }
 
     private void updateMap() {
@@ -226,11 +241,21 @@ public class Land {
 
     private void makeMove(Combatants combatant, String direction) {
         switch (direction) {
-            case "N" -> combatant.getNewPosition()[1] += 1;
-            case "E" -> combatant.getNewPosition()[0] += 1;
-            case "S" -> combatant.getNewPosition()[1] -= 1;
-            case "W" -> combatant.getNewPosition()[0] -= 1;
-            default -> System.out.println("You can't move there.");
+            case "N":
+                combatant.getNewPosition()[1] += 1;
+                break;
+            case "E":
+                combatant.getNewPosition()[0] += 1;
+                break;
+            case "S":
+                combatant.getNewPosition()[1] -= 1;
+                break;
+            case "W":
+                combatant.getNewPosition()[0] -= 1;
+                break;
+            default:
+                System.out.println("You can't move there.");
+                break;
         }
     }
 

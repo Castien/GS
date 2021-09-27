@@ -1,5 +1,6 @@
 package main;
 
+import java.util.NoSuchElementException;
 import java.util.Scanner;
 
 public class Game {
@@ -9,29 +10,31 @@ public class Game {
         Scanner scan = new Scanner(System.in);
 
         Land map = new Land();
-        boolean gameOver = false;
+        boolean playing = true;
         do{
             map.start();
             map.playGame();
+            playAgain(scan, playing);
+        }while(playing);
+    }
 
-            boolean playing;
-
-            do{
-                System.out.println("Would you like to play again? (Y or N)");
-                switch (scan.next().toUpperCase()) {
-                    case "Y":
-                        playing = true;
-                        gameOver = false;
-                        break;
-                    case "N":
-                        playing = true;
-                        gameOver = true;
-                        break;
-                    default:
-                        System.out.println("That's not a valid input, try again.");
-                        playing = false;
+    private static boolean playAgain(Scanner scan, boolean playing) {
+        do {
+            try {
+                String restart = scan.nextLine();
+                if (restart.equalsIgnoreCase("y")) {
+                    break;
+                } else if (restart.equalsIgnoreCase("n")) {
+                    System.out.println("Thanks for playing!");
+                    playing = false;
+                    break;
+                } else {
+                    throw new NoSuchElementException();
                 }
-            }while(!playing);
-        }while(!gameOver);
+            } catch (NoSuchElementException ns) {
+                System.out.println("Must choose 'y' or 'n'.");
+            }
+        } while (playing);
+        return playing;
     }
 }

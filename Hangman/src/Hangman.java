@@ -1,103 +1,193 @@
-import java.util.Scanner;
+import java.util.*;
 
 public class Hangman {
 
     static String start = (" H A N G M A N\n");
     static String beam = (" +---+\n");
     static String blank = "     |\n";
-    static String head = " +---+\n" + " O   |\n";
-    static String neck = " |   |\n";
-    static String foot = " |   |\n";
+    static String head = " O   |\n";
+    static String chest = " |   |\n";
+    static String butt = " |   |\n";
+    static String leg1 = "/    |\n";
+    static String leg2 = "/ \\  |\n";
+    static String arm1 = "/|   |\n";
+    static String arm2 = "/|\\  |\n";
     static String plat = ("    ===\n");
 
-    static String wrong0 = beam + blank + blank + blank + plat;
-    static String wrong1 = head + blank + blank + plat;
-    static String wrong2 = head + neck + blank + plat;
-    static String wrong3 = head + neck + foot + plat;
+    static String wrong0 = beam + blank + blank + blank + blank + plat;
+    static String wrong1 = beam + head + blank + blank + blank + plat;
+    static String wrong2 = beam + head + chest + blank + blank + plat;
+    static String wrong3 = beam + head + chest + butt + blank + plat;
+    static String wrong4 = beam + head + arm1 + butt + blank + plat;
+    static String wrong5 = beam + head + arm2 + butt + blank + plat;
+    static String wrong6 = beam + head + arm2 + butt + leg1 + plat;
+    static String wrong7 = beam + head + arm2 + butt + leg2 + plat;
 
-    static String[] wrongs = {wrong0, wrong1, wrong2, wrong3};
-    static int wrongIndex = 0;
+    static String[] words = new String[]{"cat", "dog", "hat", "bat", "dry", "lol", "hog", "bear", "bugs", "gator", "loser", "wizard", "giraffe"};
 
-    private static String[] words = {"cat", "dog", "hat", "bat", "dry", "lol", "hog"};
-    private static String word = words[(int) (Math.random() * words.length)];
-    private static String space = new String(new char[word.length()]).replace("\0", "_");
+    static Scanner scan = new Scanner(System.in);
+    static Random random = new Random();
 
-    private static String missed = "";
+    List<String> miss = new ArrayList<String>();
+
+    static String[] answer = new String[]{};
+    static String[] guess = new String[]{};
+
+    static Set<String> missedLetters = new HashSet<>();
+
+    static int wrongCount = 0;
+    static boolean correct = false;
+    static boolean playing = true;
+
 
     public static void main(String[] args) {
+        // write your code here
+        playHangman();
+    }
 
-        Scanner scanner = new Scanner(System.in);
-        boolean playing = true;
+    public static void playHangman() {
 
-        System.out.println(start + wrongs[wrongIndex]);
-
-        while (playing) {
-
-            //while the variable space contains spaces ('_') it will ask the player to pick a letter,
-            // stores the input in 'guess'
-            while (space.contains("_")) {
-                System.out.println("Missed letters:\n" + missed);
-                System.out.println(space);
+        do {
+            startHangman();
+            while (!correct && wrongCount < 7) {
+                System.out.println("\n" + start);
+                printGallows();
                 System.out.println("Guess a letter.");
-                String guess = scanner.next().toLowerCase();
-                String usedLetters = "";
-                usedLetters += guess;
 
-                //passes user input to gallows and missedLetter methods
-                gallows(guess);
-                missedLetter(guess, usedLetters);
+                try {
+                    String letter = scan.next();
+                    if (!isAlpha(letter)) {
+                        throw new InputMismatchException();
+                    } else {
+                        if (!checkLetter(letter)) {
+                            throw new InputMismatchException();
+                        }
+                        checkAnswer();
+                        }
+                }catch (InputMismatchException v) {
+                    System.out.println("Must be a letter from a to z.");
+                }
             }
-            scanner.close();
-        }
-    } //end of main method
+            printGallows();
+            if (!correct) System.out.println("Sorry, you're all out of tries!");
+            else
+                System.out.println(String.format("Yes! The secret word is \"%s\"! You have won!", collectionToString(Arrays.asList(guess))));
 
-    //gallows takes the user input from main method
-    public static void gallows(String guess) {
-        //initializing an empty String
-        String spaceNew = "";
-        //increments the index count until i is equal to the number of letters in the random word
-        for (int i = 0; i < word.length(); i++) {
-            //if the random word's character at the index is the same as the letter guessed,
-            //it adds it to the temporary variable spaceNew at the matching index
-            //if space's data at index i is not a '_' it will add
-            if (word.charAt(i) == guess.charAt(0)) {
-                spaceNew += guess.charAt(0);
-            } else if (space.charAt(i) != '_') {
-                spaceNew += word.charAt(i);
-            } else {
-                spaceNew += "_";
+            scan.nextLine();
+            System.out.println("Would you like to play again? (Enter 'y' or 'n':)");
+            playAgain(scan, playing);
+        } while (playing);
+    }
+
+    public static void startHangman() {
+        answer = words[random.nextInt(10)].split("");
+        guess = new String[answer.length];
+
+        for (int i = 0; i < guess.length; i++) {
+            guess[i] = "_";
+        }
+
+        wrongCount = 0;
+        missedLetters = new HashSet<String>(0);
+        correct = false;
+    }
+
+    public static void printGallows() {
+        switch (wrongCount) {
+            case 0:
+                System.out.println(wrong0);
+                break;
+            case 1:
+                System.out.println(wrong1);
+                break;
+            case 2:
+                System.out.println(wrong2);
+                break;
+            case 3:
+                System.out.println(wrong3);
+                break;
+            case 4:
+                System.out.println(wrong4);
+                break;
+            case 5:
+                System.out.println(wrong5);
+                break;
+            case 6:
+                System.out.println(wrong6);
+                break;
+            case 7:
+                System.out.println(wrong7);
+                break;
+            default:
+                System.out.println(wrongCount);
+                break;
+        }
+        System.out.println("Missed letters: " + collectionToString(missedLetters));
+        System.out.println(collectionToString(Arrays.asList(guess)));
+    }
+
+    public static String collectionToString(Collection<String> collection) {
+        String result = "";
+        for (String s : collection) {
+            result += s;
+        }
+        return result;
+    }
+
+    public static boolean isAlpha(String letter) {
+        char[] chars = letter.toCharArray();
+        boolean check = false;
+        for (char c : chars) {
+            if(!Character.isLetter(c)) {
+                return check;
+            }
+            else {
+                check = true;
             }
         }
+        return check;
+    }
 
-        if (space.equals(spaceNew)) {
-            hangman();
-        } else {
-            space = spaceNew;
+    public static boolean checkLetter(String letter) {
+        boolean isPresent = false;
+
+        for (int i = 0; i < answer.length; i++) {
+            if (letter.equals(answer[i])) {
+                guess[i] = letter;
+                isPresent = true;
+            }
         }
-        if (space.equals(word)) {
-            System.out.println("Yes! The secret word is " + word + "! You have won!");
+        if (!isPresent) {
+            missedLetters.add(letter);
+            wrongCount++;
+        }
+        return isPresent;
+    }
+
+    public static void checkAnswer() {
+        correct = true;
+        for (int i = 0; i < answer.length; i++) {
+            if (!guess[i].equals(answer[i])) correct = false;
         }
     }
 
-    public static String missedLetter(String guess, String usedLetters) {
-        if (usedLetters.contains(guess)) {
-            System.out.println("You have already guessed that letter. Choose again.");
-        }
-        if (!word.contains(guess) && !missed.contains(guess)) {
-            missed += guess;
-            wrongIndex++;
-        }
-        if (wrongIndex == 4) {
-            System.out.println("Sorry! The secret word was " + word + "! You have lost...");
-        }
-        return missed;
-    }
-
-    public static void hangman() {
-        int count = 0;
-        if (wrongIndex <= 3) {
-            System.out.println(wrongs[wrongIndex]);
-        }
+    private static boolean playAgain(Scanner scan, boolean playing) {
+        do {
+            try {
+                String restart = scan.nextLine();
+                if (restart.equalsIgnoreCase("y")) {
+                    break;
+                } else if (restart.equalsIgnoreCase("n")) {
+                    System.out.println("Thanks for playing!");
+                    playing = false;
+                } else {
+                    throw new NoSuchElementException();
+                }
+            } catch (NoSuchElementException ns) {
+                System.out.println("Must choose 'y' or 'n'.");
+            }
+        } while (true);
+        return playing;
     }
 }
 
